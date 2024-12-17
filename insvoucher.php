@@ -1,3 +1,15 @@
+<?php
+session_start();
+ob_start();
+
+if (!isset($_SESSION['id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -137,6 +149,7 @@
     </style>
 </head>
 
+
 <?php
 include('./includes/dbConfig.php');
 
@@ -146,13 +159,14 @@ if (isset($_GET['invoice_id'])) {
     $invoiceQuery = "
     SELECT 
         c.name AS customer_name,
-        c.c_id AS customer_id,
+        c.customer_id AS customer_id,
         car.brand AS car_name,
-        car.registration_number AS hss_number,
+        car.hss_no AS hss_number,
         p.payment_id AS installment_id,
         p.installment_no,
         p.amount AS installment_amount,
         p.paid_amount,
+        p.pay_status,
         p.payment_date,
         p.status AS payment_status
     FROM 
@@ -181,40 +195,25 @@ if (isset($_GET['invoice_id'])) {
     echo "<script>alert('No invoice ID provided!');</script>";
     die();
 }
+
+
+
+$query = "SELECT COUNT(`installment_no`) AS `paid_installments` FROM `payments` WHERE `status` = 'paid'";
+$result = mysqli_query($conn, $query);
+$row = mysqli_fetch_assoc($result);
+$paidInstallments = $row['paid_installments'];
+
+
 ?>
 
 <body>
 <div class="voucher-container">
     <!-- Header Section -->
     <div class="header">
-        <div class="row align-items-center">
-            <div class="col-md-3">
-                <div>Mob: 056-1719111</div>
-                <div>Mob: 056-6661350</div>
-            </div>
-            <div class="col-md-6 text-center">
-                <h1 class="company-name">الاهلية لتجارة السيارات المستعملة</h1>
-                <h2 class="company-name">ALAHLYA USED CARS TRADING</h2>
-            </div>
-            <div class="col-md-3">
-                <div>متحرك: ٠٥٦-١٧١٩١١١</div>
-                <div>متحرك: ٠٥٦-٦٦٦١٣٥٠</div>
+            <div class="row align-items-center">
+              <img src="./banner.jpg" alt="banner" classname="img-fluid"/>
             </div>
         </div>
-        <div class="row">
-            <div class="col-3 mt-5">
-                <div>Ras Al Khaimah,</div>
-                <div>United Arab Emirates</div>
-            </div>
-            <div class="col-6 cars-banner">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNjogObdUTDO1Rc7ZIwgL4eQwfZsSX3MpHMg&s">
-            </div>
-            <div class="col-3 mt-5 text-end">
-                <div>رأس الخيمة</div>
-                <div>الإمارات العربية المتحدة</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Receipt Section -->
     <div class="receipt-section">
@@ -254,8 +253,8 @@ if (isset($_GET['invoice_id'])) {
                 <input type="text" class="form-control" value="<?= $invoiceData['customer_name']; ?>" readonly>
             </div>
             <div class="col-4">
-                <label class="form-label">Customer Mob. / متحرك العميل</label>
-                <input type="text" class="form-control" value="Not Available" readonly>
+                <label class="form-label">Customer ID. / متحرك العميل</label>
+                <input type="text" class="form-control" value="<?= $invoiceData['customer_id']; ?>" readonly>
             </div>
         </div>
 
@@ -267,21 +266,25 @@ if (isset($_GET['invoice_id'])) {
 
         <!-- Total Amount and Remaining Amount in a Single Row -->
         <div class="row mb-3">
-            <div class="col-6">
+            <div class="col-4">
                 <label class="form-label">The Sum of DHS. / مبلغ وقدره فقط</label>
                 <input type="text" class="form-control" value="<?= $invoiceData['installment_amount']; ?>" readonly>
             </div>
-            <div class="col-6">
+            <div class="col-5">
                 <label class="form-label">Remaining Amount / المبلغ المتبقي</label>
                 <input type="text" class="form-control" value="00" readonly>
             </div>
+            <div class="col-3">
+    <label class="form-label">Installment No / رقم القسط</label>
+    <input type="text" class="form-control" value="<?= $paidInstallments; ?>" readonly>
+</div>
         </div>
 
         <!-- Payment Details -->
         <div class="row mb-3">
             <div class="col-8">
                 <label class="form-label">By Cash/Cheque No. / نقداً/شيك رقم</label>
-                <input type="text" class="form-control" value="نقدي" readonly>
+                <input type="text" class="form-control" value="<?= $invoiceData['pay_status']; ?>" readonly>
             </div>
             <div class="col-4">
                 <label class="form-label">Date / بتاريخ</label>

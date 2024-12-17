@@ -1,5 +1,6 @@
 <?php
 session_start();
+ob_start();
 
 if (!isset($_SESSION['id'])) {
     header("Location: login.php");
@@ -44,18 +45,18 @@ if (isset($_POST['delete_invoice'])) {
                         <div class="card">
                             <h5 class="card-header">Invoices/الفواتير</h5>
                             <div class="table-responsive text-nowrap">
-                                <table class="table">
+                                <table class="table" id="myTable">
                                     <thead>
                                         <tr>
                                             <th>SNo / الرقم</th>
-                                            <th>Customer / العميل</th>
-                                            <th>Customer ID / العميل</th>
-                                            <th>Car / السيارة</th>
-                                            <th>Hss No  / السيارة</th>
-                                            <th>Installment Amount / المبلغ الإجمالي</th>
-                                            <th>Paid / المدفوع</th>
-                                            <th>Status / المدفوع</th>
-                                            <th>Actions / الإجراءات</th>
+<th>Customer / العميل</th>
+<th>Customer ID / رقم العميل</th>
+<th>Car / السيارة</th>
+<th>Chassis No  / رقم الشاصي</th>
+<th>Installment Amount / المبلغ الإجمالي</th>
+<th>Paid / المدفوع</th>
+<th>Status / الحالة</th>
+<th>Actions / الإجراءات</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -64,9 +65,9 @@ if (isset($_POST['delete_invoice'])) {
         SELECT 
             i.invoice_id,
             c.name AS customer_name,
-            c.c_id AS customer_id,
+            c.customer_id AS customer_id,
             car.brand AS car_name,
-            car.registration_number AS hss_number,
+            car.hss_no AS hss_number,
             p.payment_id AS installment_id,
             p.installment_no,
             p.amount AS installment_amount,
@@ -88,7 +89,7 @@ if (isset($_POST['delete_invoice'])) {
 
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
-    <td>{$sno}</td>
+    <td>{$row['invoice_id']}</td>
     <td>{$row['customer_name']}</td>
     <td>{$row['customer_id']}</td>
     <td>{$row['car_name']}</td>
@@ -129,5 +130,27 @@ echo "</td>
             </div>
         </div>
     </div>
+    
+     <script>
+function myFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
 
     <?php include('./includes/footer.php'); ?>

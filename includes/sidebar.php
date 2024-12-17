@@ -125,6 +125,25 @@
             </li>
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-book"></i>
+                    <div data-i18n="Form Layouts">قسط</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item">
+                        <a href="viewinstallment.php" class="menu-link">
+                            <div data-i18n="Vertical Form">عرض القسط</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="installment.php" class="menu-link">
+                            <div data-i18n="Horizontal Form">إضافة القسط
+</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
                     <div data-i18n="Authentications">المصادقة </div>
                 </a>
@@ -209,6 +228,24 @@
                     <li class="menu-item">
                         <a href="viewInvoice.php" class="menu-link">
                             <div data-i18n="Horizontal Form">View Invoice</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-book"></i>
+                    <div data-i18n="Form Layouts">Installment</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item">
+                        <a href="installment.php" class="menu-link">
+                            <div data-i18n="Vertical Form">Add Installment</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="viewinstallment.php" class="menu-link">
+                            <div data-i18n="Horizontal Form">View Installment</div>
                         </a>
                     </li>
                 </ul>

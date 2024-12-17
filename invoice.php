@@ -1,10 +1,17 @@
 <?php
 session_start();
 
+ob_start(); 
+
+
 if (!isset($_SESSION['id'])) {
     header("Location: login.php");
     exit();
 }
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 ?>
 
@@ -26,28 +33,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $due_amount = $total_amount - $paid_amount;
     $installments = $_POST['installments'];
     $duration = $_POST['duration'];
+    $pay = $_POST['pay'];
     $created_at = date('Y-m-d H:i:s');
     $updated_at = date('Y-m-d H:i:s');
 
-    $invoice_query = "INSERT INTO invoices (customer_id, car_id, total_amount, paid_amount, description, status, due_amount, created_at, updated_at)
-                      VALUES ('$customer_id', '$car_id', '$total_amount', '$paid_amount', '$description', '', '', '$created_at', '$updated_at')";
+    $invoice_query = "INSERT INTO invoices (customer_id, car_id, total_amount, paid_amount,pay_status, description, created_at, updated_at)
+                  VALUES ('$customer_id', '$car_id', '$total_amount', '$paid_amount','$pay', '$description', '$created_at', '$updated_at')";
     if ($conn->query($invoice_query) === TRUE) {
         $invoice_id = $conn->insert_id;
 
-        if ($installments > 0) {
-            $installment_amount = $due_amount / $installments;
-            $current_date = date('Y-m-d');
+        $current_date = date('Y-m-d');
 
-            for ($i = 1; $i <= $installments; $i++) {
-                $due_date = date('Y-m-d', strtotime("+$i month", strtotime($current_date)));
-                $payment_query = "INSERT INTO payments (invoice_id, installment_no, due_date, amount, paid_amount, payment_date, status, created_at, updated_at)
-                                  VALUES ('$invoice_id', '$i', '$installment_amount', '$installment_amount', 0,'', 'Pending', '$created_at', '$updated_at')";
+if ($installments > 0) {
+    $installment_amount = $due_amount / $installments;
 
-                if (!$conn->query($payment_query)) {
-                    echo "Error: " . $payment_query . "<br>" . $conn->error;
-                }
-            }
+    for ($i = 1; $i <= $installments; $i++) {
+        $due_date = date('Y-m-d', strtotime("+$i month", strtotime($current_date)));
+
+       $payment_date = date('Y-m-d');  
+
+$payment_query = "INSERT INTO payments (invoice_id, installment_no, due_date, amount, paid_amount, payment_date, status, created_at, updated_at)
+                  VALUES ('$invoice_id', '$i', '$due_date', '$installment_amount', 0, '$payment_date', 'Pending', '$created_at', '$updated_at')";
+
+
+        if (!$conn->query($payment_query)) {
+            echo "Error: " . $payment_query . "<br>" . $conn->error;
         }
+    }
+}
+
 
         header("Location: viewInvoice.php?submitted Sucessfully");
     } else {
@@ -58,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-$customerQuery = "SELECT c_id, name, phone, address FROM customers ORDER BY name Desc";
+$customerQuery = "SELECT c_id, name, phone,customer_id, address FROM customers ORDER BY name Desc";
 $customerResult = $conn->query($customerQuery);
 
 $productQuery = "SELECT car_id, brand, model, price FROM cars ORDER BY car_id Desc";
@@ -114,7 +128,7 @@ $conn->close();
                                                             <?php
                                                             if ($customerResult && $customerResult->num_rows > 0) {
                                                                 while ($customer = $customerResult->fetch_assoc()) {
-                                                                    echo "<option value='" . $customer['c_id'] . "' data-phone='" . $customer['phone'] . "' data-address='" . $customer['address'] . "'>"
+                                                                    echo "<option value='" . $customer['c_id'] . "' data-phone='" . $customer['phone'] . "' data-card='" . $customer['customer_id'] . "'  data-address='" . $customer['address'] . "'>"
                                                                         . htmlspecialchars($customer['name']) .
                                                                         "</option>";
                                                                 }
@@ -124,7 +138,7 @@ $conn->close();
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="contact">Contact /
                                                             الاتصال</label>
@@ -132,8 +146,17 @@ $conn->close();
                                                             id="contact" name="contact" placeholder="Contact" required>
                                                     </div>
                                                 </div>
+                                                 <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="idno">Identity No /
+                                                            رقم الهوية
+</label>
+                                                        <input type="text" id="card-input" class="form-control"
+                                                            id="idno" name="idno" placeholder="id Number" required>
+                                                    </div>
+                                                </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="address">Address /
                                                             العنوان</label>
@@ -142,7 +165,7 @@ $conn->close();
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="date">Date / التاريخ</label>
                                                         <input type="date" class="form-control" id="date" name="date"
@@ -151,7 +174,7 @@ $conn->close();
                                                 </div>
                                             </div>
 
-                                            <div class="row">
+                                            <div class="row mt-4">
                                                 <div class="col-md-3">
                                                     <div class="mb-3">
                                                         <label for="carSelect" class="form-label">Select Car / اختر
@@ -198,7 +221,7 @@ $conn->close();
                                             </div>
 
                                             <!-- Additional Fields -->
-                                            <div class="row">
+                                            <div class="row mt-4">
                                                 <div class="col-md-3">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="paid_amount">Paid Amount / المبلغ
@@ -218,7 +241,7 @@ $conn->close();
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="installments">Installments /
                                                             الأقساط</label>
@@ -227,7 +250,7 @@ $conn->close();
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="mb-3">
                                                         <label for="durationSelect" class="form-label">Select Duration /
                                                             اختر المدة</label>
@@ -238,6 +261,20 @@ $conn->close();
                                                             <option value="1">One Month / شهر واحد</option>
                                                             <option value="2">Two Months / شهرين</option>
                                                             <option value="3">Three Months / ثلاثة أشهر</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="mb-3">
+                                                        <label for="durationSelect" class="form-label">Payment Method /
+                                                            طريقة الدفع</label>
+                                                        <select class="form-select" id="durationSelect" name="pay"
+                                                            aria-label="Default select example" required>
+                                                            <option selected disabled>Select duration
+                                                            </option>
+                                                            <option value="شيك">Cheque / شيك</option>
+                                                            <option value="تحويل">Transfer /تحويل</option>
+                                                            <option value="نقدي">Cash / نقدي</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -299,14 +336,17 @@ $conn->close();
 
         const customerSelect = document.getElementById('customer-select');
         const contactInput = document.getElementById('contact-input');
+        const cardInput = document.getElementById('card-input');
         const addressInput = document.getElementById('address-input');
 
         customerSelect.addEventListener('change', function () {
             const selectedOption = this.options[this.selectedIndex];
             const phone = selectedOption.getAttribute('data-phone');
+            const cardno = selectedOption.getAttribute('data-card');
             const address = selectedOption.getAttribute('data-address');
 
             contactInput.value = phone || '';
+            cardInput.value = cardno || '';
             addressInput.value = address || '';
         });
 

@@ -144,8 +144,8 @@ if (isset($_GET['invoice_id'])) {
     $invoice_id = $_GET['invoice_id'];
 
     $invoiceQuery = "
-        SELECT i.*, c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone, c.address AS customer_address, 
-               ca.brand AS car_brand, ca.model AS car_model, ca.registration_number AS car_registration, ca.description AS car_description
+        SELECT i.*, c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone, c.customer_id AS customer_no, c.address AS customer_address, 
+               ca.brand AS car_brand, ca.model AS car_model, ca.color AS car_color, ca.registration_number AS car_registration, ca.hss_no AS car_hss, ca.description AS car_description
         FROM `invoices` i
         JOIN `customers` c ON i.customer_id = c.c_id
         JOIN `cars` ca ON i.car_id = ca.car_id
@@ -170,32 +170,7 @@ if (isset($_GET['invoice_id'])) {
         <!-- Header Section -->
         <div class="header">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <div>Mob: 056-1719111</div>
-                    <div>Mob: 056-6661350</div>
-                </div>
-                <div class="col-md-6 text-center">
-                    <h1 class="company-name">الاهلية لتجارة السيارات المستعملة</h1>
-                    <h2 class="company-name">ALAHLYA USED CARS TRADING</h2>
-                </div>
-                <div class="col-md-3">
-                    <div>متحرك: ٠٥٦-١٧١٩١١١</div>
-                    <div>متحرك: ٠٥٦-٦٦٦١٣٥٠</div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-3 mt-5">
-                    <div>Ras Al Khaimah,</div>
-                    <div>United Arab Emirates</div>
-                </div>
-                <div class="col-6 cars-banner">
-                    <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNjogObdUTDO1Rc7ZIwgL4eQwfZsSX3MpHMg&s">
-                </div>
-                <div class="col-3 mt-5 text-end">
-                    <div>رأس الخيمة</div>
-                    <div>الإمارات العربية المتحدة</div>
-                </div>
+              <img src="./banner.jpg" alt="banner" classname="img-fluid"/>
             </div>
         </div>
 
@@ -234,9 +209,13 @@ if (isset($_GET['invoice_id'])) {
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-8">
+                <div class="col-4">
                     <label class="form-label">Customer Details / تفاصيل العميل</label>
                     <input type="text" class="form-control" value="<?= $invoiceData['customer_name']; ?>" readonly>
+                </div>
+                 <div class="col-4">
+                    <label class="form-label">Customer ID No /رقم الهوية </label>
+                    <input type="text" class="form-control" value="<?= $invoiceData['customer_no']; ?>" readonly>
                 </div>
                 <div class="col-4">
                     <label class="form-label">Customer Mob. / متحرك العميل</label>
@@ -244,14 +223,26 @@ if (isset($_GET['invoice_id'])) {
                 </div>
             </div>
 
-            <!-- Car Details -->
-            <div class="mb-3">
-                <label class="form-label">Car Details / تفاصيل السيارة</label>
-                <input type="text" class="form-control"
-                    value="<?= $invoiceData['car_brand'] . ' ' . $invoiceData['car_model']; ?>" readonly>
+           <div class="row mb-3">
+                <div class="col-3">
+                    <label class="form-label">Car Brand /ماركة السيارة  </label>
+                    <input type="text" class="form-control" value="<?= $invoiceData['car_brand']; ?>" readonly>
+                </div>
+                 <div class="col-3">
+                    <label class="form-label">car Model /نموذج السيارة </label>
+                    <input type="text" class="form-control" value="<?= $invoiceData['car_model']; ?>" readonly>
+                </div>
+                <div class="col-3">
+                    <label class="form-label">Car Color / لون السيارة</label>
+                    <input type="text" class="form-control" value="<?= $invoiceData['car_color']; ?>" readonly>
+                </div>
+                 <div class="col-3">
+                    <label class="form-label">chassis number / رقم الشاصي</label>
+                    <input type="text" class="form-control" value="<?= $invoiceData['car_hss']; ?>" readonly>
+                </div>
             </div>
 
-            <!-- Total Amount and Remaining Amount in a Single Row -->
+
             <div class="row mb-3">
                 <div class="col-6">
                     <label class="form-label">The Sum of DHS. / مبلغ وقدره فقط</label>
@@ -267,7 +258,7 @@ if (isset($_GET['invoice_id'])) {
             <div class="row mb-3">
                 <div class="col-8">
                     <label class="form-label">By Cash/Cheque No. / نقداً/شيك رقم</label>
-                    <input type="text" class="form-control" value="نقدي" readonly>
+                    <input type="text" class="form-control"  value="<?= $invoiceData['pay_status']; ?>" readonly>
                 </div>
                 <div class="col-4">
                     <label class="form-label">Date / بتاريخ</label>

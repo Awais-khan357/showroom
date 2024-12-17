@@ -44,10 +44,10 @@ if (isset($_POST['delete_invoice'])) {
                         <div class="card">
                             <h5 class="card-header">Invoices/الفواتير</h5>
                             <div class="table-responsive text-nowrap">
-                                <table class="table">
+                                <table class="table" id="myTable">
                                     <thead>
                                         <tr>
-                                            <th>SNo / الرقم</th>
+                                            <th>Invoice No/ الرقم</th>
                                             <th>Customer / العميل</th>
                                             <th>Car / السيارة</th>
                                             <th>Total Amount / المبلغ الإجمالي</th>
@@ -57,20 +57,16 @@ if (isset($_POST['delete_invoice'])) {
                                             <th>Actions / الإجراءات</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                     <tbody>
                                         <?php
                                         $query = "
-            SELECT i.invoice_id, c.name AS customer_name, ca.brand AS car_brand, ca.model AS car_model, 
-                   i.total_amount, i.paid_amount, i.due_amount, i.status 
-            FROM `invoices` i
-            JOIN `customers` c ON i.customer_id = c.c_id
-            JOIN `cars` ca ON i.car_id = ca.car_id";
+            SELECT i.invoice_id, c.name AS customer_name, ca.brand AS car_brand, ca.model AS car_model, i.total_amount, i.paid_amount, i.due_amount, i.status FROM `invoices` i JOIN `customers` c ON i.customer_id = c.c_id JOIN `cars` ca ON i.car_id = ca.car_id ORDER by i.created_at DESC";
                                         $result = $conn->query($query);
                                         $sno = 1;
 
                                         while ($row = $result->fetch_assoc()) {
                                             echo "<tr>
-    <td>{$sno}</td>
+    <td>{$row['invoice_id']}</td>
     <td>{$row['customer_name']}</td>
     <td>{$row['car_brand']} - {$row['car_model']}</td>
     <td>{$row['total_amount']}</td>
@@ -107,5 +103,28 @@ echo "<td>
             </div>
         </div>
     </div>
+    
+     <script>
+function myFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
 
     <?php include('./includes/footer.php'); ?>
